@@ -1,7 +1,6 @@
 import { useDashboardStore } from '../store/useDashboardStore';
 import MetricsCards from './MetricsCards';
 import MetricsChart from './MetricsChart';
-import LiveDataTable from './LiveDataTable';
 
 const Dashboard = () => {
   const { data, isLoading, error, isConnected } = useDashboardStore();
@@ -46,19 +45,12 @@ const Dashboard = () => {
       <MetricsCards />
       
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="w-full">
         <div className="card">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             System Metrics
           </h2>
           <MetricsChart />
-        </div>
-        
-        <div className="card">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Live Events
-          </h2>
-          <LiveDataTable />
         </div>
       </div>
       

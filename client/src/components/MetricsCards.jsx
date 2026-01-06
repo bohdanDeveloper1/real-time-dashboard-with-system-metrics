@@ -1,47 +1,55 @@
 import { useDashboardStore } from '../store/useDashboardStore';
+import { useMemo } from 'react';
 
 const MetricsCards = () => {
   const { data } = useDashboardStore();
 
-  if (!data) return null;
+  const metrics = useMemo(() => {
+    if (!data?.metrics ||
+      !data.metrics?.cpu ||
+      !data.metrics?.memory ||
+      !data.metrics?.network ||
+      !data.metrics?.disk
+    ) return null;
 
-  const metrics = [
-    {
-      title: 'CPU Usage',
-      value: `${data.metrics.cpu.toFixed(1)}%`,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      trend: data.metrics.cpu > 80 ? 'high' : data.metrics.cpu > 50 ? 'medium' : 'low'
-    },
-    {
-      title: 'Memory Usage',
-      value: `${data.metrics.memory.toFixed(1)}%`,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      trend: data.metrics.memory > 80 ? 'high' : data.metrics.memory > 50 ? 'medium' : 'low'
-    },
-    {
-      title: 'Network Traffic',
-      value: `${data.metrics.network.toFixed(0)} MB/s`,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      trend: data.metrics.network > 800 ? 'high' : data.metrics.network > 400 ? 'medium' : 'low'
-    },
-    {
-      title: 'Disk Usage',
-      value: `${data.metrics.disk.toFixed(1)}%`,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      trend: data.metrics.disk > 80 ? 'high' : data.metrics.disk > 50 ? 'medium' : 'low'
-    },
-    {
-      title: 'Active Users',
-      value: data.users.toLocaleString(),
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-      trend: 'normal'
-    }
-  ];
+    return [
+            {
+              title: 'CPU Usage',
+              value: `${data.metrics?.cpu?.toFixed(1)}%`,
+              color: 'text-blue-600',
+              bgColor: 'bg-blue-50',
+              trend: data.metrics?.cpu > 80 ? 'high' : data.metrics?.cpu > 50 ? 'medium' : 'low'
+            },
+            {
+              title: 'RAM Usage',
+              value: `${data.metrics?.memory?.toFixed(1)}%`,
+              color: 'text-green-600',
+              bgColor: 'bg-green-50',
+              trend: data.metrics?.memory > 80 ? 'high' : data.metrics?.memory > 50 ? 'medium' : 'low'
+            },
+            {
+              title: 'Network Traffic',
+              value: `${data.metrics?.network?.toFixed(4)} MB/s`,
+              color: 'text-purple-600',
+              bgColor: 'bg-purple-50',
+              trend: data.metrics?.network > 8 ? 'high' : data.metrics?.network > 4 ? 'medium' : 'low'
+            },
+            {
+              title: 'Disk Usage',
+              value: `${data.metrics?.disk?.toFixed(1)}%`,
+              color: 'text-orange-600',
+              bgColor: 'bg-orange-50',
+              trend: data.metrics?.disk > 80 ? 'high' : data.metrics?.disk > 50 ? 'medium' : 'low'
+            },
+            {
+              title: 'Active Users',
+              value: data.users?.toLocaleString(),
+              color: 'text-indigo-600',
+              bgColor: 'bg-indigo-50',
+              trend: 'normal'
+            }
+    ];
+  }, [data])
 
   const getTrendColor = (trend) => {
     switch (trend) {
@@ -60,7 +68,7 @@ const MetricsCards = () => {
     switch (title) {
       case 'CPU Usage':
         return '🖥️';
-      case 'Memory Usage':
+      case 'RAM Usage':
         return '🧠';
       case 'Network Traffic':
         return '🌐';
@@ -74,35 +82,44 @@ const MetricsCards = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-      {metrics.map((metric, index) => (
-        <div key={index} className="metric-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">
-                {metric.title}
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {metric.value}
-              </p>
+    metrics ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {metrics.map((metric, index) => (
+          <div key={index} className="metric-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  {metric.title}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {metric?.value}
+                </p>
+              </div>
+              <div className={`p-3 rounded-lg ${metric.bgColor}`}>
+                <span className="text-2xl">{getIcon(metric.title)}</span>
+              </div>
             </div>
-            <div className={`p-3 rounded-lg ${metric.bgColor}`}>
-              <span className="text-2xl">{getIcon(metric.title)}</span>
+            <div className="mt-4">
+              <div className="flex items-center text-sm">
+                <span className={`font-medium ${getTrendColor(metric.trend)}`}>
+                  {metric.trend === 'high' ? 'High' : 
+                  metric.trend === 'medium' ? 'Medium' : 
+                  metric.trend === 'low' ? 'Low' : ''}
+                </span>
+                <div className={`ml-2 w-2 h-2 rounded-full ${getTrendColor(metric.trend).replace('text-', 'bg-')}`} />
+              </div>
             </div>
           </div>
-          <div className="mt-4">
-            <div className="flex items-center text-sm">
-              <span className={`font-medium ${getTrendColor(metric.trend)}`}>
-                {metric.trend === 'high' ? 'High' : 
-                 metric.trend === 'medium' ? 'Medium' : 
-                 metric.trend === 'low' ? 'Low' : 'Normal'}
-              </span>
-              <div className={`ml-2 w-2 h-2 rounded-full ${getTrendColor(metric.trend).replace('text-', 'bg-')}`} />
-            </div>
-          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        <div className="text-center">
+          <div className="text-lg font-medium mb-2">No metrics available</div>
+          <div className="text-sm">Waiting for metrics...</div>
         </div>
-      ))}
-    </div>
+      </div>
+    )
   );
 };
 

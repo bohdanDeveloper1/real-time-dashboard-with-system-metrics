@@ -76,10 +76,10 @@ export const useDashboardStore = create(
       const { historicalData } = get();
       return historicalData.map(item => ({
         timestamp: new Date(item.timestamp),
-        cpu: item.metrics.cpu,
-        memory: item.metrics.memory,
-        network: item.metrics.network,
-        disk: item.metrics.disk,
+        cpu: item.metrics?.cpu,
+        memory: item.metrics?.memory,
+        network: item.metrics?.network,
+        disk: item.metrics?.disk,
       }));
     },
   }))

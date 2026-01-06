@@ -1,10 +1,31 @@
 import { useDashboardStore } from '../store/useDashboardStore';
+import { useState, useEffect } from 'react';
 
 const MetricsChart = () => {
   const { getMetricsData } = useDashboardStore();
   const metricsData = getMetricsData();
 
-  if (metricsData.length === 0) {
+  const maxValue = 100;
+  const chartHeight = 200;
+  const [chartWidth, setChartWidth] = useState(0);
+
+  useEffect(() => {
+    const updateChartWidth = () => {
+      setChartWidth(window.innerWidth - 100);
+    };
+
+    // Set initial width
+    updateChartWidth();
+
+    // Update on resize
+    window.addEventListener('resize', updateChartWidth);
+
+    return () => {
+      window.removeEventListener('resize', updateChartWidth);
+    };
+  });
+
+  if (metricsData?.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-500">
         <div className="text-center">
@@ -14,10 +35,6 @@ const MetricsChart = () => {
       </div>
     );
   }
-
-  const maxValue = 100;
-  const chartHeight = 200;
-  const chartWidth = 600;
 
   const createPath = (data, color) => {
     if (data.length < 2) return '';
@@ -31,10 +48,10 @@ const MetricsChart = () => {
     return `M ${points.join(' L ')}`;
   };
 
-  const cpuData = metricsData.map(item => ({ value: item.cpu }));
-  const memoryData = metricsData.map(item => ({ value: item.memory }));
-  const networkData = metricsData.map(item => ({ value: item.network / 10 }));
-  const diskData = metricsData.map(item => ({ value: item.disk }));
+  const cpuData = metricsData.map(item => ({ value: item?.cpu || 0 }));
+  const memoryData = metricsData.map(item => ({ value: item?.memory || 0 }));
+  const networkData = metricsData.map(item => ({ value: item?.network / 10 || 0 }));
+  const diskData = metricsData.map(item => ({ value: item?.disk || 0 }));
 
   return (
     <div className="h-80">
@@ -47,7 +64,7 @@ const MetricsChart = () => {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span>Memory</span>
+            <span>RAM</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-purple-500 rounded"></div>
@@ -61,7 +78,13 @@ const MetricsChart = () => {
       </div>
       
       <div className="relative overflow-x-auto">
-        <svg width={chartWidth} height={chartHeight} className="min-w-full">
+        <svg 
+          height={chartHeight} 
+          style={{ width: '100vw', maxWidth: `${chartWidth}px` }}
+          className="block"
+          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+          preserveAspectRatio="none"
+        >
           {/* Grid lines */}
           {[0, 25, 50, 75, 100].map((value) => (
             <line

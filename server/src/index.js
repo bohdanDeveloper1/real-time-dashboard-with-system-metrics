@@ -26,16 +26,18 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+const activeUserIds = [];
+
 // Socket.io connection handling
 io.on('connection', async (socket) => {
-  console.log(`Client connected: ${socket.id}`);
+  activeUserIds.push(socket.id);
   
   // Send initial data
   socket.emit('data', await generateResponseData());
   
   // Handle client disconnection
   socket.on('disconnect', () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    activeUserIds.splice(activeUserIds.indexOf(socket.id), 1);
   });
   
   // Handle client requests for data
@@ -52,7 +54,7 @@ async function generateResponseData() {
     timestamp: new Date().toISOString(),
     metrics: systemMetrics,
     // todo: fix it
-    users: Math.floor(Math.random() * 1000) + 100,
+    users: activeUserIds.length,
   };
   
   return data;

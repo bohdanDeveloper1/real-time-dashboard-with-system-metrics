@@ -50,7 +50,6 @@ const MetricsChart = () => {
 
   const cpuData = metricsData.map(item => ({ value: item?.cpu || 0 }));
   const memoryData = metricsData.map(item => ({ value: item?.memory || 0 }));
-  const networkData = metricsData.map(item => ({ value: item?.network / 10 || 0 }));
   const diskData = metricsData.map(item => ({ value: item?.disk || 0 }));
 
   return (
@@ -65,10 +64,6 @@ const MetricsChart = () => {
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
             <span>RAM</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-purple-500 rounded"></div>
-            <span>Network</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-orange-500 rounded"></div>
@@ -111,15 +106,6 @@ const MetricsChart = () => {
           <path
             d={createPath(memoryData)}
             stroke="#22c55e"
-            strokeWidth="2"
-            fill="none"
-            opacity="0.8"
-          />
-          
-          {/* Network line */}
-          <path
-            d={createPath(networkData)}
-            stroke="#a855f7"
             strokeWidth="2"
             fill="none"
             opacity="0.8"

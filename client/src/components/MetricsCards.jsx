@@ -8,7 +8,6 @@ const MetricsCards = () => {
     if (!data?.metrics ||
       !data.metrics?.cpu ||
       !data.metrics?.memory ||
-      !data.metrics?.network ||
       !data.metrics?.disk
     ) return null;
 
@@ -26,13 +25,6 @@ const MetricsCards = () => {
               color: 'text-green-600',
               bgColor: 'bg-green-50',
               trend: data.metrics?.memory > 80 ? 'high' : data.metrics?.memory > 50 ? 'medium' : 'low'
-            },
-            {
-              title: 'Network Traffic',
-              value: `${data.metrics?.network?.toFixed(4)} MB/s`,
-              color: 'text-purple-600',
-              bgColor: 'bg-purple-50',
-              trend: data.metrics?.network > 8 ? 'high' : data.metrics?.network > 4 ? 'medium' : 'low'
             },
             {
               title: 'Disk Usage',
@@ -70,8 +62,6 @@ const MetricsCards = () => {
         return '🖥️';
       case 'RAM Usage':
         return '🧠';
-      case 'Network Traffic':
-        return '🌐';
       case 'Disk Usage':
         return '💾';
       case 'Active Users':

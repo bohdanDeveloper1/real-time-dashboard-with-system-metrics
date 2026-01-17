@@ -8,8 +8,11 @@ import { calculateSystemMetrixService } from './services/CalculateSystemMetrixSe
 
 dotenv.config();
 
+// step 1: create express app
 const app = express();
 const server = createServer(app);
+
+// step 2: configure socket.io server 
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
@@ -17,22 +20,21 @@ const io = new Server(server, {
   }
 });
 
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 const activeUserIds = [];
 
-// Socket.io connection handling
+// step 3: Socket.io connection handling (Listens for new client connections) 
 io.on('connection', async (socket) => {
   activeUserIds.push(socket.id);
   
-  // Send initial data
+  // Send initial data for connected client
   socket.emit('data', await generateResponseData());
   
   // Handle client disconnection
@@ -46,25 +48,23 @@ io.on('connection', async (socket) => {
   });
 });
 
-// Mock data generator for live dashboard
 async function generateResponseData() {
   const systemMetrics = await calculateSystemMetrixService.getSystemMetrics();
 
   const data = {
     timestamp: new Date().toISOString(),
     metrics: systemMetrics,
-    // todo: fix it
     users: activeUserIds.length,
   };
   
   return data;
 }
 
-// Start periodic data emission
+// step 4: Start periodic data emission (Emits data to all connected clients every 2 seconds)
 setInterval(async () => {
   const data = await generateResponseData();
   io.emit('data', data);
-}, 2000); // Emit data every 2 seconds
+}, 2000);
 
 const PORT = 3001;
 

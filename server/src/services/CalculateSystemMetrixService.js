@@ -15,9 +15,9 @@ class CalculateSystemMetrixService {
         const diskUsagePercent = this.calculateDiskUsagePercent(disks);
         
         return {
-            cpu: cpu?.currentLoad || 0, // %
-            memory: (mem?.used / mem?.total) * 100 || 0, // %
-            disk: diskUsagePercent, // %
+            cpu: cpu?.currentLoad || 0,
+            memory: (mem?.used / mem?.total) * 100 || 0,
+            disk: diskUsagePercent,
         };
     }
 

@@ -21,7 +21,6 @@ function App() {
         setError(null);
         
         const socket = websocketService.connect();
-        
         // Listen for connection events
         socket.on('connect', () => {
           setConnected(true);
